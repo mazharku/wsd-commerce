@@ -18,6 +18,7 @@ import java.util.List;
 public class Sale {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer saleId;
 

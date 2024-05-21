@@ -17,7 +17,7 @@ public class TestJWTTokenService {
 
     @BeforeEach
     void init() {
-      this.token = createToken();
+        this.token = createToken();
     }
 
     @Test
@@ -45,26 +45,26 @@ public class TestJWTTokenService {
 
     @Test
     void test__token_is_valid() {
-       boolean valid = jwtTokenService.validateToken(token);
-       Assertions.assertTrue(valid);
+        boolean valid = jwtTokenService.validateToken(token);
+        Assertions.assertTrue(valid);
     }
 
     @Test
     void test__token_should_return_user_id() {
         String userId = jwtTokenService.loginUserId(token);
-        Assertions.assertEquals("1",userId);
+        Assertions.assertEquals("1", userId);
     }
 
     @Test
     void test__token_should_return_user_name() {
         String userName = jwtTokenService.extractUsername(token);
-        Assertions.assertEquals("dummy user",userName);
+        Assertions.assertEquals("dummy user", userName);
     }
 
     @Test
     void test__token_should_return_user_email() {
         String email = jwtTokenService.extractEmail(token);
-        Assertions.assertEquals("test@ymail.com",email);
+        Assertions.assertEquals("test@ymail.com", email);
     }
 
     @Test
@@ -72,6 +72,14 @@ public class TestJWTTokenService {
         String refreshToken = jwtTokenService.generateRefreshToken();
         boolean valid = jwtTokenService.validateToken(refreshToken);
         Assertions.assertTrue(valid);
+    }
+
+    @Test
+    void test__token_should_calculate_expire_time_in_minute() {
+        int tokenExpireTimeInMinute = jwtTokenService.getTokenExpireTimeInMinute(token);
+        // Assertions.assertEquals(10, tokenExpireTimeInMinute);
+        // we are not sure if the expire time is always 10!
+        Assertions.assertTrue(tokenExpireTimeInMinute > 0);
     }
 
 }

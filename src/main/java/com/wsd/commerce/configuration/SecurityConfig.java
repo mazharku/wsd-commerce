@@ -75,7 +75,9 @@ public class SecurityConfig {
                         "/swagger*/**",
                         "/webjars/**",
                         "/swagger-ui/**",
-                        "/actuator/**"
+                        "/actuator/**",
+                        "/api/auth/login",
+                        "/api/auth/signup"
                 );
     }
 }

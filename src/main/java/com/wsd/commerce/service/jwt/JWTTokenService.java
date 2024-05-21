@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +52,7 @@ public class JWTTokenService {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(jwt);
             return true;
         } catch (Exception e) {
-            return false;
+            throw new RuntimeException("Invalid token!");
         }
     }
 
@@ -84,6 +87,13 @@ public class JWTTokenService {
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
+    }
+
+    public int getTokenExpireTimeInMinute(String jwt) {
+        Date expiration = parseClaimsFromJWT(jwt).getExpiration();
+        Instant instant = expiration.toInstant();
+        LocalDateTime tokenTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return tokenTime.getMinute() - LocalDateTime.now().getMinute();
     }
 
 }
