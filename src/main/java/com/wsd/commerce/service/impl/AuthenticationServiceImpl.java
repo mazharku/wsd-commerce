@@ -9,6 +9,7 @@ import com.wsd.commerce.model.exceptions.ResourceNotFoundException;
 import com.wsd.commerce.repository.RoleRepository;
 import com.wsd.commerce.repository.UserRepository;
 import com.wsd.commerce.service.AuthenticationService;
+import com.wsd.commerce.service.jwt.JWTTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,9 +23,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
-     private final UserRepository userRepository;
-     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
+    private final JWTTokenService tokenService;
     @Override
     public void signup(SignupRequest signupRequest) {
         User user = new User();
@@ -39,14 +41,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private Set<Role> createUserRole(List<String> roles) {
         return roles.stream()
-                .map(role-> roleRepository.findByRoleName(role)
-                        .orElseThrow(()-> new ResourceNotFoundException("Role %s not found".formatted(role))))
+                .map(role -> roleRepository.findByRoleName(role)
+                        .orElseThrow(() -> new ResourceNotFoundException("Role %s not found".formatted(role))))
                 .collect(Collectors.toSet());
     }
 
     @Override
     public LoginResponse login(LogInRequest logInRequest) {
-        return null;
+        User user = userRepository.findByEmail(logInRequest.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("No registered user is found"));
+
+        String token = tokenService.generateToken(user);
+        int tokenExpireTimeInMinute = tokenService.getTokenExpireTimeInMinute(token);
+        String refreshToken = tokenService.generateRefreshToken();
+
+        LoginResponse response = new LoginResponse();
+        response.setToken(token);
+        response.setExpireTime(String.valueOf(tokenExpireTimeInMinute));
+        response.setRefreshToken(refreshToken);
+        return response;
     }
 
     @Override
