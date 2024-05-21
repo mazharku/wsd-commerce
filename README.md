@@ -4,6 +4,7 @@
  
  - go to the project directory
  - build the project with `./gradlew build`
+ - change `password` and `db name` in `.env` file
  - use docker command `docker-compose up`
  - access the app through 
 
