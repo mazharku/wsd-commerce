@@ -23,7 +23,7 @@ import java.util.List;
 public class SalesController {
     private final SaleService service;
 
-    @GetMapping("/customer/wish")
+    @GetMapping("/wish-list")
     public ResponseEntity<Page<ProductResponse>> customerWishList(@RequestParam(name = "offset") int offset,
                                                                   @RequestParam(name = "limit") int limit) {
         Pageable pageable = PageRequest.of(offset, limit, Sort.by("price").descending());
