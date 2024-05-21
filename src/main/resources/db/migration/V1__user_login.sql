@@ -7,19 +7,19 @@ CREATE TABLE user_role
 
 CREATE TABLE users
 (
-    id        INT          NOT NULL,
+    id        INT AUTO_INCREMENT NOT NULL,
     name      VARCHAR(128) NOT NULL,
     email     VARCHAR(256) NOT NULL,
     password  VARCHAR(256) NOT NULL,
     phone     VARCHAR(255) NULL,
-    is_active BIT(1)       NULL,
+    is_active BIT(1) NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
 CREATE TABLE roles
 (
-    id   INT          NOT NULL,
+    id        INT          NOT NULL,
     role_name VARCHAR(255) NOT NULL,
-    is_active BIT(1)       NULL,
+    is_active BIT(1) NULL,
     CONSTRAINT pk_roles PRIMARY KEY (id)
 );

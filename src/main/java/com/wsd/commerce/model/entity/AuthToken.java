@@ -19,12 +19,12 @@ public class AuthToken {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
     private String token;
 
     @Column(name = "token_creation_time", nullable = false)
     private LocalDateTime tokenCreationTime;
-    
+
 }
