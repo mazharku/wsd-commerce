@@ -2,7 +2,7 @@ CREATE TABLE auth_token
 (
     id                  INT AUTO_INCREMENT NOT NULL,
     user_id             INT                NOT NULL,
-    token               VARCHAR(255)       NULL,
+    token               VARCHAR(1024)       NULL,
     token_creation_time datetime           NOT NULL,
     CONSTRAINT pk_auth_token PRIMARY KEY (id)
 );
