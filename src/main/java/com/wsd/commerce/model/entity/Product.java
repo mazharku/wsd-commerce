@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -22,8 +25,14 @@ public class Product {
     @Column(name = "price")
     private double price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sale_id", referencedColumnName = "id")
-    private Sale sale;
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
+    private List<Sale> sales;
+
+    public void setSales(List<Sale> sales) {
+        if(this.sales==null) {
+            this.sales = new ArrayList<>();
+        }
+        this.sales.addAll(sales);
+    }
 
 }

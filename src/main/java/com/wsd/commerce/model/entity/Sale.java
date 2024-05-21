@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @Getter
@@ -30,8 +28,9 @@ public class Sale {
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private User customer;
 
-    @OneToMany(mappedBy = "sale",fetch = FetchType.LAZY)
-    private List<Product> products;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    private Product product;
 
     @Column(name = "quantity")
     private double quantity;
@@ -41,26 +40,6 @@ public class Sale {
     private double totalAmount;
 
     @Column(name = "sale_at")
-    private LocalDateTime saleAt;
+    private LocalDate saleAt;
 
-    public void setProducts(List<Product> products) {
-        if (this.products == null) {
-            this.products = new ArrayList<>();
-        }
-        this.products.addAll(products);
-    }
-
-    public void addProduct(Product product) {
-        if (this.products == null) {
-            this.products = new ArrayList<>();
-        }
-        this.products.add(product);
-    }
-
-    public List<Product> getProducts() {
-        if (this.products == null) {
-            this.products = new ArrayList<>();
-        }
-        return this.products;
-    }
 }

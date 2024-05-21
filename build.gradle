@@ -11,6 +11,11 @@ java {
 	sourceCompatibility = '21'
 }
 
+springBoot {
+	buildInfo()
+}
+
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -56,4 +61,8 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+bootJar {
+	enabled = true
 }
