@@ -1,7 +1,9 @@
 package com.wsd.commerce.service.impl;
 
+import com.wsd.commerce.model.dto.product.ProductResponse;
 import com.wsd.commerce.model.dto.product.ProductSale;
 import com.wsd.commerce.model.entity.Sale;
+import com.wsd.commerce.repository.ProductRepository;
 import com.wsd.commerce.repository.SaleRepository;
 import com.wsd.commerce.service.SaleService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class SaleServiceImpl implements SaleService {
     private final SaleRepository saleRepository;
-
+    private final ProductRepository productRepository;
     @Override
     public double currentDaySaleAmount() {
         return saleRepository.findAllBySaleAt(LocalDate.now()).stream()
@@ -62,6 +64,14 @@ public class SaleServiceImpl implements SaleService {
         return saleRepository.findTopFiveSellingProductsLastMonth(firstDayOfLastMonth,lastDateOfLastMonth)
                 .stream()
                 .map(ProductSale::getName)
+                .toList();
+    }
+
+    @Override
+    public List<ProductResponse> customerWishList() {
+        return productRepository.findAll()
+                .stream()
+                .map(e-> new ProductResponse(e.getName(),e.getPrice()))
                 .toList();
     }
 }

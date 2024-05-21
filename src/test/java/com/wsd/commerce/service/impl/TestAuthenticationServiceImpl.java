@@ -10,6 +10,7 @@ import com.wsd.commerce.model.exceptions.ResourceNotFoundException;
 import com.wsd.commerce.repository.AuthTokenRepository;
 import com.wsd.commerce.repository.RoleRepository;
 import com.wsd.commerce.repository.UserRepository;
+import com.wsd.commerce.service.AuthenticationService;
 import com.wsd.commerce.service.jwt.JWTTokenService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ public class TestAuthenticationServiceImpl {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private AuthenticationServiceImpl service;
+    private AuthenticationService service;
 
     @Test
     void test__signup_create_new_user() {

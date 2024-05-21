@@ -3,6 +3,7 @@ package com.wsd.commerce.service.impl;
 import com.wsd.commerce.model.dto.product.ProductSale;
 import com.wsd.commerce.model.entity.Product;
 import com.wsd.commerce.model.entity.Sale;
+import com.wsd.commerce.repository.ProductRepository;
 import com.wsd.commerce.repository.SaleRepository;
 import com.wsd.commerce.service.SaleService;
 import org.junit.jupiter.api.Assertions;
@@ -16,10 +17,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 @SpringBootTest(classes = SaleServiceImpl.class)
 public class TestSaleServiceImpl {
     @MockBean
     private SaleRepository saleRepository;
+
+    @MockBean
+    private ProductRepository productRepository;
 
     @Autowired
     private SaleService service;
@@ -168,15 +175,21 @@ public class TestSaleServiceImpl {
     @Test
     void test__should_return_current_day_sale_amount() {
         Mockito.when(saleRepository.findAllBySaleAt(LocalDate.now())).thenReturn(todaySales());
+
         var result = service.currentDaySaleAmount();
+
         Assertions.assertEquals(result, 360);
+        verify(saleRepository, times(1)).findAllBySaleAt(LocalDate.now());
     }
 
     @Test
     void test__should_return_zero_for_no_sale() {
         Mockito.when(saleRepository.findAllBySaleAt(LocalDate.now())).thenReturn(List.of());
+
         var result = service.currentDaySaleAmount();
+
         Assertions.assertEquals(result, 0);
+        verify(saleRepository, times(1)).findAllBySaleAt(LocalDate.now());
     }
 
     @Test
@@ -190,6 +203,7 @@ public class TestSaleServiceImpl {
         LocalDate expectedDate = LocalDate.of(2024, 4, 10);
 
         Assertions.assertEquals(expectedDate, result);
+        verify(saleRepository, times(1)).findAllBySaleAtBetween(startDate,endDate);
     }
 
     @Test
@@ -203,6 +217,7 @@ public class TestSaleServiceImpl {
         LocalDate expectedDate = LocalDate.now();
 
         Assertions.assertEquals(expectedDate, result);
+        verify(saleRepository, times(1)).findAllBySaleAtBetween(startDate,endDate);
     }
 
     @Test
@@ -213,6 +228,7 @@ public class TestSaleServiceImpl {
         List<String> expectedValue = List.of("phone", "tv", "watch","remote", "mango");
 
         Assertions.assertEquals(expectedValue, result);
+        verify(saleRepository, times(1)).findTopSaleProduct();
     }
 
     @Test
@@ -223,6 +239,17 @@ public class TestSaleServiceImpl {
         List<String> expectedValue = List.of("phone", "tv", "watch");
 
         Assertions.assertEquals(expectedValue, result);
+        verify(saleRepository, times(1)).findTopSaleProduct();
+    }
+
+    @Test
+    void test__customer_wish_list_should_return_all_product_list() {
+        Mockito.when(productRepository.findAll()).thenReturn(List.of(mango(),tv(),watch(),remote(),phone()));
+
+        var result = service.customerWishList();
+
+        Assertions.assertEquals(5, result.size());
+        verify(productRepository, times(1)).findAll();
     }
 
 }
