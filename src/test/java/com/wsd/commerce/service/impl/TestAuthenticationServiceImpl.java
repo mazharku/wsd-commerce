@@ -3,9 +3,11 @@ package com.wsd.commerce.service.impl;
 import com.wsd.commerce.model.dto.auth.LogInRequest;
 import com.wsd.commerce.model.dto.auth.LoginResponse;
 import com.wsd.commerce.model.dto.auth.SignupRequest;
+import com.wsd.commerce.model.entity.AuthToken;
 import com.wsd.commerce.model.entity.Role;
 import com.wsd.commerce.model.entity.User;
 import com.wsd.commerce.model.exceptions.ResourceNotFoundException;
+import com.wsd.commerce.repository.AuthTokenRepository;
 import com.wsd.commerce.repository.RoleRepository;
 import com.wsd.commerce.repository.UserRepository;
 import com.wsd.commerce.service.jwt.JWTTokenService;
@@ -16,12 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -39,6 +43,12 @@ public class TestAuthenticationServiceImpl {
 
     @SpyBean
     private JWTTokenService tokenService;
+
+    @MockBean
+    private AuthTokenRepository authTokenRepository;
+
+    @MockBean
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private AuthenticationServiceImpl service;
@@ -72,7 +82,7 @@ public class TestAuthenticationServiceImpl {
 
         ResourceNotFoundException response = assertThrows(ResourceNotFoundException.class, () -> service.signup(signupRequest));
         verify(roleRepository, times(1)).findByRoleName(roleUser);
-        Assertions.assertEquals("Role System not found", response.getMessage());
+        assertEquals("Role System not found", response.getMessage());
     }
 
     @Test
@@ -93,6 +103,7 @@ public class TestAuthenticationServiceImpl {
 
         Assertions.assertNotNull(loginResponse.getToken());
         verify(userRepository, times(1)).findByEmail(email);
+        verify(authTokenRepository, times(1)).save(Mockito.any(AuthToken.class));
 
     }
 
@@ -112,9 +123,38 @@ public class TestAuthenticationServiceImpl {
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
         ResourceNotFoundException response = assertThrows(ResourceNotFoundException.class,()->service.login(logInRequest));
 
-        Assertions.assertEquals("No registered user is found", response.getMessage());
+        assertEquals("No registered user is found", response.getMessage());
         verify(userRepository, times(1)).findByEmail(email);
+        verify(authTokenRepository, times(0)).save(Mockito.any(AuthToken.class));
+    }
 
+    @Test
+    void test__auth_token_should_remove_for_logout() {
+        String validToken = "validToken";
+        AuthToken authToken = new AuthToken();
+
+        when(authTokenRepository.findByToken(validToken)).thenReturn(Optional.of(authToken));
+
+        service.logout(validToken);
+
+        verify(authTokenRepository, times(1)).findByToken(validToken);
+        verify(authTokenRepository, times(1)).delete(Mockito.any(AuthToken.class));
+    }
+
+
+    @Test
+    void test__logout_should_throw_exception_for_non_existence_token() {
+        String validToken = "validToken";
+        AuthToken authToken = new AuthToken();
+
+        when(authTokenRepository.findByToken(validToken)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException response = assertThrows(ResourceNotFoundException.class,
+                ()-> service.logout(validToken));
+
+        assertEquals("token is not exist!", response.getMessage());
+        verify(authTokenRepository, times(1)).findByToken(validToken);
+        verify(authTokenRepository, times(0)).delete(Mockito.any(AuthToken.class));
     }
 
 

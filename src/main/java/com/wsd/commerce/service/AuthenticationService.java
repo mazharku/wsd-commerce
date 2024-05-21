@@ -9,6 +9,6 @@ public interface AuthenticationService {
     void signup(SignupRequest signupRequest);
     LoginResponse login(LogInRequest logInRequest);
 
-    boolean logout(String token);
+    void logout(String token);
 
 }

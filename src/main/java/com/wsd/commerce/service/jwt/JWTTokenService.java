@@ -52,7 +52,7 @@ public class JWTTokenService {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(jwt);
             return true;
         } catch (Exception e) {
-            return false;
+            throw new RuntimeException("Invalid token!");
         }
     }
 
