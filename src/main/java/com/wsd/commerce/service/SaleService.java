@@ -1,6 +1,8 @@
 package com.wsd.commerce.service;
 
 import com.wsd.commerce.model.dto.product.ProductResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,6 +17,6 @@ public interface SaleService {
 
     List<String> lastMonthTopFiveSaleProduct();
 
-    List<ProductResponse> customerWishList();
+    Page<ProductResponse> customerWishList(Pageable pageable);
 
 }

@@ -1,5 +1,6 @@
 package com.wsd.commerce.service.impl;
 
+import com.wsd.commerce.model.dto.product.ProductResponse;
 import com.wsd.commerce.model.dto.product.ProductSale;
 import com.wsd.commerce.model.entity.Product;
 import com.wsd.commerce.model.entity.Sale;
@@ -12,6 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -244,12 +246,20 @@ public class TestSaleServiceImpl {
 
     @Test
     void test__customer_wish_list_should_return_all_product_list() {
-        Mockito.when(productRepository.findAll()).thenReturn(List.of(mango(),tv(),watch(),remote(),phone()));
+        Pageable pageable = PageRequest.of(0, 2, Sort.by("price").descending());
 
-        var result = service.customerWishList();
+        List<Product> products = List.of(mango(), tv());
+        Page<Product> productPage = new PageImpl<>(products, pageable, products.size());
 
-        Assertions.assertEquals(5, result.size());
-        verify(productRepository, times(1)).findAll();
+        Mockito.when(productRepository.findAll(pageable)).thenReturn(productPage);
+
+        Page<ProductResponse> result = service.customerWishList(pageable);
+
+        List<ProductResponse> responseList = result.getContent();
+
+        Assertions.assertEquals(2, responseList.size());
+        Assertions.assertEquals("mango", responseList.getFirst().getName());
+        verify(productRepository, times(1)).findAll(pageable);
     }
 
 }

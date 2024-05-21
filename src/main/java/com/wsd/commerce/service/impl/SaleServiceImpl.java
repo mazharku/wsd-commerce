@@ -7,11 +7,14 @@ import com.wsd.commerce.repository.ProductRepository;
 import com.wsd.commerce.repository.SaleRepository;
 import com.wsd.commerce.service.SaleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 public class SaleServiceImpl implements SaleService {
     private final SaleRepository saleRepository;
     private final ProductRepository productRepository;
+
     @Override
     public double currentDaySaleAmount() {
         return saleRepository.findAllBySaleAt(LocalDate.now()).stream()
@@ -36,13 +40,12 @@ public class SaleServiceImpl implements SaleService {
                 .mapToDouble(e->e)
                 .max().orElse(0.0);
 
-        for(LocalDate date: dateWiseSaleAmount.keySet()){
-            if(dateWiseSaleAmount.get(date)==maxSaleAmount){
-                return date;
-            }
-        }
+        Optional<LocalDate> maxSaleDate = dateWiseSaleAmount.entrySet().stream()
+                .filter(entry -> entry.getValue() == maxSaleAmount)
+                .map(Map.Entry::getKey)
+                .findFirst();
 
-        return LocalDate.now();
+        return maxSaleDate.orElse(LocalDate.now());
 
     }
 
@@ -68,10 +71,8 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public List<ProductResponse> customerWishList() {
-        return productRepository.findAll()
-                .stream()
-                .map(e-> new ProductResponse(e.getName(),e.getPrice()))
-                .toList();
+    public Page<ProductResponse> customerWishList(Pageable pageable) {
+        return productRepository.findAll(pageable)
+                .map(e-> new ProductResponse(e.getName(),e.getPrice()));
     }
 }
